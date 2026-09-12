@@ -18,8 +18,14 @@ import {
   FolderGit2,
   Cpu,
   Award,
+  Upload,
+  Camera,
+  FileUp,
+  FileCheck,
+  Image as ImageIcon,
 } from "lucide-react";
 import { usePortfolio } from "../context/PortfolioContext";
+import { compressImage, readFileAsDataUrl } from "../utils/fileUpload";
 
 export default function EditModal() {
   const {
@@ -87,7 +93,86 @@ export default function EditModal() {
 
   const triggerToast = (message) => {
     setSaveToast(message);
-    setTimeout(() => setSaveToast(null), 3000);
+    setTimeout(() => setSaveToast(null), 3500);
+  };
+
+  // Direct Profile Photo Upload handler
+  const handleProfilePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      triggerToast("Optimizing & loading profile photo...");
+      const compressedDataUrl = await compressImage(file, 600, 600, 0.85);
+      setFormPersonal((prev) => ({ ...prev, profileImage: compressedDataUrl }));
+      triggerToast("Profile photo loaded! Click 'Save & Apply' to update your site.");
+    } catch (err) {
+      console.error(err);
+      triggerToast("Failed to process photo: " + (err.message || "Unknown error"));
+    }
+  };
+
+  // Direct Resume PDF Upload handler
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      triggerToast(`Loading resume file (${file.name})...`);
+      const res = await readFileAsDataUrl(file);
+      setFormPersonal((prev) => ({
+        ...prev,
+        resumeFile: res.dataUrl,
+        resumeFileName: file.name,
+      }));
+      triggerToast(`Resume file "${file.name}" loaded! Click 'Save & Apply'.`);
+    } catch (err) {
+      triggerToast("Failed to load resume: " + (err.message || "Unknown error"));
+    }
+  };
+
+  // Direct Certificate File Upload handler
+  const handleCertFileUpload = async (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      triggerToast(`Loading certificate for "${formCerts[index].name}"...`);
+      let dataUrl = "";
+      if (file.type.startsWith("image/")) {
+        dataUrl = await compressImage(file, 1200, 1200, 0.85);
+      } else {
+        const res = await readFileAsDataUrl(file);
+        dataUrl = res.dataUrl;
+      }
+
+      const updated = [...formCerts];
+      updated[index] = {
+        ...updated[index],
+        fileData: dataUrl,
+        fileName: file.name,
+        fileType: file.type,
+        link: dataUrl,
+        placeholder: false,
+      };
+      setFormCerts(updated);
+      triggerToast(`Certificate file "${file.name}" loaded! Click 'Save & Apply'.`);
+    } catch (err) {
+      console.error(err);
+      triggerToast("Failed to load certificate: " + (err.message || "Unknown error"));
+    }
+  };
+
+  // Remove uploaded certificate file
+  const handleRemoveCertFile = (index) => {
+    const updated = [...formCerts];
+    updated[index] = {
+      ...updated[index],
+      fileData: null,
+      fileName: null,
+      fileType: null,
+      link: "#",
+      placeholder: true,
+    };
+    setFormCerts(updated);
+    triggerToast("Certificate file removed.");
   };
 
   const handleSaveAll = () => {
@@ -534,23 +619,140 @@ export default function EditModal() {
                       onChange={(e) => setFormPersonal({ ...formPersonal, careerInterest: e.target.value })}
                     />
                   </div>
-                  <div>
-                    <label style={labelStyle}>Profile Image URL (leave empty for avatar)</label>
-                    <input
-                      style={inputStyle}
-                      placeholder="/profile.jpg or image URL"
-                      value={formPersonal.profileImage || ""}
-                      onChange={(e) => setFormPersonal({ ...formPersonal, profileImage: e.target.value || null })}
-                    />
+                  {/* Direct Profile Photo Upload */}
+                  <div
+                    style={{
+                      gridColumn: "1 / -1",
+                      padding: "16px 20px",
+                      borderRadius: 14,
+                      border: "1px solid var(--border-glass)",
+                      background: "rgba(15, 23, 42, 0.45)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 20,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {/* Circular Avatar Preview */}
+                    <div
+                      style={{
+                        position: "relative",
+                        width: 76,
+                        height: 76,
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        border: "2px solid var(--accent-blue)",
+                        boxShadow: "0 0 15px var(--glow-blue)",
+                        background: "var(--bg-secondary)",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {formPersonal.profileImage ? (
+                        <img
+                          src={formPersonal.profileImage}
+                          alt="Profile Preview"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <User size={38} style={{ color: "var(--text-muted)", opacity: 0.5 }} />
+                      )}
+                    </div>
+
+                    {/* Upload Controls */}
+                    <div style={{ flex: 1, minWidth: 240 }}>
+                      <label style={{ ...labelStyle, fontSize: "0.95rem", color: "var(--accent-blue)", marginBottom: 4 }}>
+                        Profile Photo (Upload Directly)
+                      </label>
+                      <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0 0 12px" }}>
+                        Upload your photo directly from your laptop. It will be automatically optimized and displayed on your hero section.
+                      </p>
+
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                        <label
+                          className="btn-primary"
+                          style={{
+                            padding: "8px 16px",
+                            fontSize: "0.85rem",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <Camera size={15} /> Upload Photo
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={handleProfilePhotoUpload}
+                          />
+                        </label>
+
+                        {formPersonal.profileImage && (
+                          <button
+                            type="button"
+                            onClick={() => setFormPersonal({ ...formPersonal, profileImage: null })}
+                            className="btn-secondary"
+                            style={{ padding: "8px 14px", fontSize: "0.85rem", color: "#f87171" }}
+                          >
+                            Remove Photo
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label style={labelStyle}>Resume File Path / Link</label>
-                    <input
-                      style={inputStyle}
-                      placeholder="/resume.pdf"
-                      value={formPersonal.resumeFile || ""}
-                      onChange={(e) => setFormPersonal({ ...formPersonal, resumeFile: e.target.value })}
-                    />
+
+                  {/* Direct Resume File Upload */}
+                  <div
+                    style={{
+                      gridColumn: "1 / -1",
+                      padding: "16px 20px",
+                      borderRadius: 14,
+                      border: "1px solid var(--border-glass)",
+                      background: "rgba(15, 23, 42, 0.45)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 16,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div>
+                      <label style={{ ...labelStyle, fontSize: "0.95rem", color: "var(--accent-cyan)", marginBottom: 4 }}>
+                        Resume File (Upload Directly)
+                      </label>
+                      <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: 0 }}>
+                        Current file:{" "}
+                        <strong style={{ color: "var(--text-primary)" }}>
+                          {formPersonal.resumeFileName || formPersonal.resumeFile || "Default (/resume.pdf)"}
+                        </strong>
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      <label
+                        className="btn-secondary"
+                        style={{
+                          padding: "8px 16px",
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                        }}
+                      >
+                        <FileUp size={15} /> Upload Resume (PDF)
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          style={{ display: "none" }}
+                          onChange={handleResumeUpload}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
               )}
@@ -780,53 +982,139 @@ export default function EditModal() {
                     <div
                       key={idx}
                       style={{
-                        padding: 16,
-                        borderRadius: 12,
+                        padding: 18,
+                        borderRadius: 14,
                         border: "1px solid var(--border-glass)",
-                        background: "rgba(15, 23, 42, 0.4)",
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr auto",
-                        gap: 12,
-                        alignItems: "end",
+                        background: "rgba(15, 23, 42, 0.45)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 14,
                       }}
                     >
-                      <div>
-                        <label style={labelStyle}>Certificate Name</label>
-                        <input
-                          style={inputStyle}
-                          value={c.name}
-                          onChange={(e) => updateCertField(idx, "name", e.target.value)}
-                        />
+                      {/* Name, Issuer & Delete */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 12, alignItems: "center" }}>
+                        <div>
+                          <label style={labelStyle}>Certificate Name</label>
+                          <input
+                            style={inputStyle}
+                            value={c.name}
+                            onChange={(e) => updateCertField(idx, "name", e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label style={labelStyle}>Issuer / Organization</label>
+                          <input
+                            style={inputStyle}
+                            value={c.issuer}
+                            onChange={(e) => updateCertField(idx, "issuer", e.target.value)}
+                          />
+                        </div>
+                        <div style={{ paddingTop: 20 }}>
+                          <button
+                            onClick={() => removeCert(idx)}
+                            style={{
+                              background: "rgba(239, 68, 68, 0.15)",
+                              border: "1px solid rgba(239, 68, 68, 0.3)",
+                              color: "#ef4444",
+                              cursor: "pointer",
+                              padding: "10px 12px",
+                              borderRadius: 8,
+                            }}
+                            title="Delete certification"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
-                      <div>
-                        <label style={labelStyle}>Issuer / Org</label>
-                        <input
-                          style={inputStyle}
-                          value={c.issuer}
-                          onChange={(e) => updateCertField(idx, "issuer", e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Link / Verification URL</label>
-                        <input
-                          style={inputStyle}
-                          value={c.link}
-                          onChange={(e) => updateCertField(idx, "link", e.target.value)}
-                        />
-                      </div>
-                      <button
-                        onClick={() => removeCert(idx)}
+
+                      {/* Direct File Upload & Verification Link */}
+                      <div
                         style={{
-                          background: "transparent",
-                          border: "none",
-                          color: "#ef4444",
-                          cursor: "pointer",
-                          padding: "10px 8px",
+                          padding: "12px 14px",
+                          borderRadius: 10,
+                          background: "rgba(10, 16, 32, 0.5)",
+                          border: "1px solid rgba(59, 130, 246, 0.2)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: 12,
                         }}
-                        title="Delete certification"
                       >
-                        <Trash2 size={18} />
-                      </button>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          {/* Mini Thumbnail if image */}
+                          {(c.fileData || (c.link && c.link.startsWith("data:image/"))) && (
+                            <div
+                              style={{
+                                width: 42,
+                                height: 42,
+                                borderRadius: 8,
+                                overflow: "hidden",
+                                border: "1px solid var(--accent-blue)",
+                                flexShrink: 0,
+                              }}
+                            >
+                              <img
+                                src={c.fileData || c.link}
+                                alt="Cert preview"
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              />
+                            </div>
+                          )}
+
+                          <div>
+                            <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                              {c.fileData || (c.link && c.link.startsWith("data:")) ? (
+                                <span style={{ color: "#10b981", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                                  <FileCheck size={16} /> File Uploaded: {c.fileName || "Certificate File"}
+                                </span>
+                              ) : (
+                                <span style={{ color: "var(--text-muted)" }}>
+                                  No certificate file uploaded directly yet
+                                </span>
+                              )}
+                            </div>
+                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                              Supports image files (PNG, JPG, WebP) or PDF documents
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Upload & Clear buttons */}
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <label
+                            className="btn-primary"
+                            style={{
+                              padding: "7px 14px",
+                              fontSize: "0.82rem",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                            }}
+                          >
+                            <Upload size={14} />
+                            {c.fileData || (c.link && c.link.startsWith("data:")) ? "Change File" : "Upload File"}
+                            <input
+                              type="file"
+                              accept="image/*,application/pdf"
+                              style={{ display: "none" }}
+                              onChange={(e) => handleCertFileUpload(idx, e)}
+                            />
+                          </label>
+
+                          {(c.fileData || (c.link && c.link.startsWith("data:"))) && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCertFile(idx)}
+                              className="btn-secondary"
+                              style={{ padding: "7px 12px", fontSize: "0.82rem", color: "#f87171" }}
+                            >
+                              Remove File
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
