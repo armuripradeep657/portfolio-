@@ -1,5 +1,5 @@
 import { Trophy, Calendar, Presentation, Code, GraduationCap } from "lucide-react";
-import { achievements } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const iconMap = {
@@ -19,6 +19,7 @@ const colors = [
 ];
 
 export default function Achievements() {
+  const { achievements } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
 
   return (

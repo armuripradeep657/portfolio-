@@ -1,8 +1,9 @@
 import { Download, FileText } from "lucide-react";
-import { personalInfo } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 export default function Resume() {
+  const { personalInfo } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
 
   return (

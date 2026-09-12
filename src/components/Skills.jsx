@@ -5,7 +5,7 @@ import {
   GitBranch, MonitorSmartphone, Flame, Cloud,
 } from "lucide-react";
 import { GithubIcon } from "./SocialIcons";
-import { skills } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 // Map icon string names to Lucide components (or custom)
@@ -24,6 +24,7 @@ const categoryColors = {
 };
 
 export default function Skills() {
+  const { skills } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
 
   return (

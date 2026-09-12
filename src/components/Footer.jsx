@@ -1,8 +1,10 @@
 import { Mail, ArrowUp, Heart } from "lucide-react";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "./SocialIcons";
-import { socialLinks } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 
 export default function Footer() {
+  const { socialLinks, personalInfo } = usePortfolio();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -105,7 +107,7 @@ export default function Footer() {
             marginBottom: 8,
           }}
         >
-          © 2026 ARMURI PRADEEP. All Rights Reserved.
+          © 2026 {personalInfo.name || "ARMURI PRADEEP"}. All Rights Reserved.
         </p>
 
         <p

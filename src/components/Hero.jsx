@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { Download, Send, Mail, User } from "lucide-react";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "./SocialIcons";
-import { personalInfo, socialLinks } from "../data/portfolioData";
-
-const subtitles = ["CSE AI Student", "Developer", "AI Enthusiast"];
+import { usePortfolio } from "../context/PortfolioContext";
 
 export default function Hero() {
+  const { personalInfo, socialLinks } = usePortfolio();
+  const subtitles = personalInfo?.title
+    ? personalInfo.title.split("|").map((s) => s.trim()).filter(Boolean)
+    : ["CSE AI Student", "Developer", "AI Enthusiast"];
+
   const [currentText, setCurrentText] = useState("");
   const [subtitleIndex, setSubtitleIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);

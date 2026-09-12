@@ -1,6 +1,6 @@
-import { ExternalLink, Brain, Droplets, Users, Bot } from "lucide-react";
+import { ExternalLink, Brain, Droplets, Users, Bot, Code2 } from "lucide-react";
 import { GithubIcon } from "./SocialIcons";
-import { projects, socialLinks } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const projectIcons = {
@@ -18,6 +18,7 @@ const colorAccents = {
 };
 
 export default function Projects() {
+  const { projects, socialLinks } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
 
   return (
@@ -40,7 +41,7 @@ export default function Projects() {
         >
           {projects.map((project) => {
             const colors = colorAccents[project.color] || colorAccents.blue;
-            const Icon = projectIcons[project.id];
+            const Icon = projectIcons[project.id] || <Code2 size={32} />;
 
             return (
               <div

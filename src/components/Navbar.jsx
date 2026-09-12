@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon, Code } from "lucide-react";
-import { navLinks } from "../data/portfolioData";
+import { Menu, X, Sun, Moon, Code, Lock, Edit3 } from "lucide-react";
+import { usePortfolio } from "../context/PortfolioContext";
 
 export default function Navbar({ theme, toggleTheme }) {
+  const { navLinks, personalInfo, setIsEditorOpen, isAuthenticated } = usePortfolio();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
@@ -33,7 +34,7 @@ export default function Navbar({ theme, toggleTheme }) {
     });
 
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [navLinks]);
 
   const handleNavClick = (href) => {
     setIsOpen(false);
@@ -87,7 +88,7 @@ export default function Navbar({ theme, toggleTheme }) {
         >
           <Code size={22} style={{ color: "var(--accent-blue)" }} />
           <span>&lt;/&gt;</span>
-          <span className="gradient-text">PRADEEP</span>
+          <span className="gradient-text">{personalInfo.firstName || "PRADEEP"}</span>
         </a>
 
         {/* Desktop links */}
@@ -155,10 +156,62 @@ export default function Navbar({ theme, toggleTheme }) {
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
+
+          {/* Admin Edit Button */}
+          <button
+            onClick={() => setIsEditorOpen(true)}
+            aria-label="Edit portfolio details"
+            title="Edit Portfolio Details"
+            style={{
+              marginLeft: 4,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "0 12px",
+              height: 40,
+              borderRadius: 10,
+              border: "1px solid rgba(59,130,246,0.3)",
+              background: "rgba(59,130,246,0.1)",
+              color: "var(--accent-blue)",
+              cursor: "pointer",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              transition: "all 0.25s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(59,130,246,0.2)";
+              e.currentTarget.style.borderColor = "var(--accent-blue)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(59,130,246,0.1)";
+              e.currentTarget.style.borderColor = "rgba(59,130,246,0.3)";
+            }}
+          >
+            {isAuthenticated ? <Edit3 size={16} /> : <Lock size={15} />}
+            <span>Edit</span>
+          </button>
         </div>
 
         {/* Mobile controls */}
         <div className="nav-mobile-controls" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            onClick={() => setIsEditorOpen(true)}
+            aria-label="Edit details"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              border: "1px solid rgba(59,130,246,0.3)",
+              background: "rgba(59,130,246,0.1)",
+              color: "var(--accent-blue)",
+              cursor: "pointer",
+            }}
+          >
+            {isAuthenticated ? <Edit3 size={18} /> : <Lock size={18} />}
+          </button>
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"

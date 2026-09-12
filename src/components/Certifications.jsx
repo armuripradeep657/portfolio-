@@ -1,5 +1,5 @@
 import { ExternalLink, Award } from "lucide-react";
-import { certifications } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const issuerColors = {
@@ -11,6 +11,7 @@ const issuerColors = {
 };
 
 export default function Certifications() {
+  const { certifications } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
 
   return (

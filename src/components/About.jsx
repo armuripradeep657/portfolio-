@@ -1,16 +1,17 @@
 import { GraduationCap, MapPin, Mail, Briefcase } from "lucide-react";
-import { personalInfo, aboutText } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
-const infoCards = [
-  { icon: <GraduationCap size={20} />, label: "Education", value: personalInfo.education },
-  { icon: <MapPin size={20} />, label: "Location", value: personalInfo.location },
-  { icon: <Mail size={20} />, label: "Email", value: personalInfo.email },
-  { icon: <Briefcase size={20} />, label: "Career Interest", value: personalInfo.careerInterest },
-];
-
 export default function About() {
+  const { personalInfo, aboutText } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
+
+  const infoCards = [
+    { icon: <GraduationCap size={20} />, label: "Education", value: personalInfo.education },
+    { icon: <MapPin size={20} />, label: "Location", value: personalInfo.location },
+    { icon: <Mail size={20} />, label: "Email", value: personalInfo.email },
+    { icon: <Briefcase size={20} />, label: "Career Interest", value: personalInfo.careerInterest },
+  ];
 
   return (
     <section id="about" className="section-container">

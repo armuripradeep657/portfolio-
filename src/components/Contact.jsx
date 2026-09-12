@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Send, Mail, MapPin, CheckCircle } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./SocialIcons";
-import { personalInfo, socialLinks } from "../data/portfolioData";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 export default function Contact() {
+  const { personalInfo, socialLinks } = usePortfolio();
   const [ref, isVisible] = useScrollReveal();
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);

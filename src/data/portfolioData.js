@@ -19,7 +19,7 @@ export const personalInfo = {
 };
 
 export const socialLinks = {
-  github: "https://github.com/YOUR_GITHUB_USERNAME",
+  github: "https://github.com/armuripradeep657",
   linkedin: "https://linkedin.com/in/YOUR_LINKEDIN_USERNAME",
   email: "mailto:YOUR_EMAIL@example.com",
   instagram: "https://instagram.com/YOUR_INSTAGRAM_USERNAME",
@@ -70,7 +70,7 @@ export const projects = [
     description:
       "A machine-learning project comparing SVM and KNN algorithms for classification of lung cancer data with high accuracy.",
     technologies: ["Python", "Pandas", "NumPy", "Scikit-learn", "SVM", "KNN"],
-    github: "https://github.com/YOUR_GITHUB_USERNAME/lung-cancer-classification",
+    github: "https://github.com/armuripradeep657/lung-cancer-classification",
     liveDemo: "#",
     color: "blue",
   },
@@ -80,7 +80,7 @@ export const projects = [
     description:
       "An IoT-based smart irrigation system designed to monitor soil conditions and automate irrigation for efficient water usage.",
     technologies: ["Python", "IoT", "Sensors", "Firebase"],
-    github: "https://github.com/YOUR_GITHUB_USERNAME/smart-irrigation",
+    github: "https://github.com/armuripradeep657/smart-irrigation",
     liveDemo: "#",
     color: "green",
   },
@@ -90,7 +90,7 @@ export const projects = [
     description:
       "A Java-based system for managing student records, recruitment information, resumes, skills, and placement activities.",
     technologies: ["Java", "OOP", "MySQL"],
-    github: "https://github.com/YOUR_GITHUB_USERNAME/placement-management",
+    github: "https://github.com/armuripradeep657/placement-management",
     liveDemo: "#",
     color: "purple",
   },
@@ -100,7 +100,7 @@ export const projects = [
     description:
       "An intelligent assistant designed to answer user queries using NLP and AI/LLM technologies with conversational abilities.",
     technologies: ["Python", "NLP", "LLM", "APIs"],
-    github: "https://github.com/YOUR_GITHUB_USERNAME/ai-assistant",
+    github: "https://github.com/armuripradeep657/ai-assistant",
     liveDemo: "#",
     color: "cyan",
   },
